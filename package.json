@@ -21,9 +21,16 @@
     "build": "npm run build:shared && npm run build -w backend && npm run build -w frontend",
     "lint": "npm run lint -w backend && npm run lint -w frontend",
     "test": "npm run test -w backend",
-    "typecheck": "npm run build:shared && tsc -p backend/tsconfig.json --noEmit"
+    "typecheck": "npm run build:shared && tsc -p backend/tsconfig.json --noEmit",
+    "db:start": "npx --yes supabase start",
+    "db:stop": "npx --yes supabase stop",
+    "db:reset": "npx --yes supabase db reset",
+    "db:push": "npx --yes supabase db push",
+    "db:seed": "tsx scripts/seed.ts"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0"
+    "concurrently": "^9.1.0",
+    "dotenv": "^17.4.2",
+    "tsx": "^4.22.4"
   }
 }
