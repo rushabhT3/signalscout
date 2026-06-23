@@ -2,12 +2,16 @@ import type { INestApplication } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
 import { AppModule } from "../src/app.module";
+import { SupabaseHealthCheck } from "../src/supabase/supabase.health";
 
 describe("Health (e2e)", () => {
   let app: INestApplication;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+      .overrideProvider(SupabaseHealthCheck)
+      .useValue({ name: "supabase", check: async () => true })
+      .compile();
     app = moduleRef.createNestApplication({ bufferLogs: false });
     await app.init();
   });
