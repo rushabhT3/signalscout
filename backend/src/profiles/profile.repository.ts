@@ -87,6 +87,25 @@ export class ProfileRepository {
     }
   }
 
+  /**
+   * Atomically claims the one-time welcome: marks welcomed_at only if still null.
+   * Returns contact details when this call performed the claim, else null.
+   */
+  async claimWelcome(userId: string): Promise<{ email: string; fullName: string | null } | null> {
+    const { data, error } = await this.supabase.admin
+      .from("profiles")
+      .update({ welcomed_at: new Date().toISOString() })
+      .eq("id", userId)
+      .is("welcomed_at", null)
+      .select("email, full_name")
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Failed to claim welcome: ${error.message}`);
+    }
+    return data ? { email: data.email, fullName: data.full_name } : null;
+  }
+
   private toPublic(row: ProfileRow): PublicProfile {
     return {
       id: row.id,

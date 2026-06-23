@@ -7,6 +7,7 @@ import { AppConfigService } from "./config/app-config.service";
 import { validateEnv } from "./config/env.schema";
 import { buildLoggerParams } from "./common/logger/pino.config";
 import { SupabaseModule } from "./supabase/supabase.module";
+import { EmailModule } from "./email/email.module";
 import { AuthModule } from "./auth/auth.module";
 import { HealthModule } from "./health/health.module";
 import { ProfilesModule } from "./profiles/profiles.module";
@@ -31,6 +32,7 @@ import { BillingModule } from "./billing/billing.module";
       useFactory: (config: AppConfigService) => buildLoggerParams(config),
     }),
     SupabaseModule,
+    EmailModule,
     AuthModule,
     HealthModule,
     ProfilesModule,

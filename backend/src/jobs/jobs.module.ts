@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { ProfilesModule } from "../profiles/profiles.module";
 import { SignalsModule } from "../signals/signals.module";
 import { TrackersModule } from "../trackers/trackers.module";
 import { IngestionRunnerService } from "./ingestion-runner.service";
@@ -7,7 +8,7 @@ import { InternalSecretGuard } from "./internal-secret.guard";
 import { JobsController } from "./jobs.controller";
 
 @Module({
-  imports: [SignalsModule, TrackersModule],
+  imports: [ProfilesModule, SignalsModule, TrackersModule],
   controllers: [JobsController],
   providers: [IngestionRunnerService, IngestionScheduler, InternalSecretGuard],
 })
