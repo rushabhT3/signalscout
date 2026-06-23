@@ -34,3 +34,8 @@ Thumbs.db
 # misc
 .turbo/
 .vercel/
+
+# playwright
+test-results/
+playwright-report/
+**/.playwright/
