@@ -1,7 +1,11 @@
-import { Module } from "@nestjs/common";
-import { HealthController } from "./health.controller";
-import { HealthService, READINESS_CHECKS, type DependencyCheck } from "./health.service";
-import { SupabaseHealthCheck } from "../supabase/supabase.health";
+import { Module } from '@nestjs/common';
+import { HealthController } from './health.controller';
+import {
+  HealthService,
+  READINESS_CHECKS,
+  type DependencyCheck,
+} from './health.service';
+import { SupabaseHealthCheck } from '../supabase/supabase.health';
 
 @Module({
   controllers: [HealthController],
@@ -11,7 +15,9 @@ import { SupabaseHealthCheck } from "../supabase/supabase.health";
     {
       provide: READINESS_CHECKS,
       inject: [SupabaseHealthCheck],
-      useFactory: (supabase: SupabaseHealthCheck): DependencyCheck[] => [supabase],
+      useFactory: (supabase: SupabaseHealthCheck): DependencyCheck[] => [
+        supabase,
+      ],
     },
   ],
 })

@@ -1,9 +1,9 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { AppConfigService } from "../config/app-config.service";
-import { EmailService } from "../email/email.service";
-import { ProfileRepository } from "../profiles/profile.repository";
-import { SignalsService } from "../signals/signals.service";
-import { TrackerRepository } from "../trackers/tracker.repository";
+import { Injectable, Logger } from '@nestjs/common';
+import { AppConfigService } from '../config/app-config.service';
+import { EmailService } from '../email/email.service';
+import { ProfileRepository } from '../profiles/profile.repository';
+import { SignalsService } from '../signals/signals.service';
+import { TrackerRepository } from '../trackers/tracker.repository';
 
 export interface IngestionSweepSummary {
   trackersProcessed: number;
@@ -41,7 +41,9 @@ export class IngestionRunnerService {
     };
 
     if (this.isRunning) {
-      this.logger.warn("Ingestion sweep already in progress; skipping this trigger.");
+      this.logger.warn(
+        'Ingestion sweep already in progress; skipping this trigger.',
+      );
       return summary;
     }
 
@@ -62,14 +64,17 @@ export class IngestionRunnerService {
         );
 
         for (const outcome of settled) {
-          if (outcome.status === "fulfilled") {
+          if (outcome.status === 'fulfilled') {
             const { userId, result } = outcome.value;
             summary.trackersProcessed += 1;
             summary.postingsIngested += result.postingsIngested;
             summary.evaluated += result.evaluated;
             summary.matches += result.matches;
             if (result.matches > 0) {
-              matchesByUser.set(userId, (matchesByUser.get(userId) ?? 0) + result.matches);
+              matchesByUser.set(
+                userId,
+                (matchesByUser.get(userId) ?? 0) + result.matches,
+              );
             }
           } else {
             summary.trackersFailed += 1;

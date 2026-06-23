@@ -1,4 +1,7 @@
-import type { JobBoardProvider, NormalizedJobPosting } from "@signalscout/shared";
+import type {
+  JobBoardProvider,
+  NormalizedJobPosting,
+} from '@signalscout/shared';
 
 /**
  * Contract every job-board integration implements. New providers are added by
@@ -6,7 +9,10 @@ import type { JobBoardProvider, NormalizedJobPosting } from "@signalscout/shared
  */
 export interface JobBoardAdapter {
   readonly provider: JobBoardProvider;
-  fetchPostings(slug: string, companyName: string): Promise<NormalizedJobPosting[]>;
+  fetchPostings(
+    slug: string,
+    companyName: string,
+  ): Promise<NormalizedJobPosting[]>;
 }
 
-export const JOB_BOARD_ADAPTERS = Symbol("JOB_BOARD_ADAPTERS");
+export const JOB_BOARD_ADAPTERS = Symbol('JOB_BOARD_ADAPTERS');

@@ -1,7 +1,7 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { Resend } from "resend";
-import { AppConfigService } from "../config/app-config.service";
-import { digestEmail, welcomeEmail, type EmailContent } from "./templates";
+import { Injectable, Logger } from '@nestjs/common';
+import { Resend } from 'resend';
+import { AppConfigService } from '../config/app-config.service';
+import { digestEmail, welcomeEmail, type EmailContent } from './templates';
 
 /**
  * Thin wrapper over Resend. Email failures never break the calling flow, and the
@@ -23,17 +23,27 @@ export class EmailService {
     return this.client !== null && Boolean(this.from);
   }
 
-  sendWelcome(to: string, name: string | null, dashboardUrl: string): Promise<void> {
+  sendWelcome(
+    to: string,
+    name: string | null,
+    dashboardUrl: string,
+  ): Promise<void> {
     return this.send(to, welcomeEmail(name, dashboardUrl));
   }
 
-  sendDigest(to: string, newMatches: number, dashboardUrl: string): Promise<void> {
+  sendDigest(
+    to: string,
+    newMatches: number,
+    dashboardUrl: string,
+  ): Promise<void> {
     return this.send(to, digestEmail(newMatches, dashboardUrl));
   }
 
   private async send(to: string, content: EmailContent): Promise<void> {
     if (!this.client || !this.from) {
-      this.logger.debug(`Email disabled; skipped "${content.subject}" to ${to}`);
+      this.logger.debug(
+        `Email disabled; skipped "${content.subject}" to ${to}`,
+      );
       return;
     }
     const { error } = await this.client.emails.send({
@@ -43,7 +53,9 @@ export class EmailService {
       html: content.html,
     });
     if (error) {
-      this.logger.error(`Failed to send "${content.subject}" to ${to}: ${error.message}`);
+      this.logger.error(
+        `Failed to send "${content.subject}" to ${to}: ${error.message}`,
+      );
     }
   }
 }

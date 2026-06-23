@@ -1,8 +1,8 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { SchedulerRegistry } from "@nestjs/schedule";
-import { CronJob } from "cron";
-import { AppConfigService } from "../config/app-config.service";
-import { IngestionRunnerService } from "./ingestion-runner.service";
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { CronJob } from 'cron';
+import { AppConfigService } from '../config/app-config.service';
+import { IngestionRunnerService } from './ingestion-runner.service';
 
 /**
  * In-process cron for local/always-on deployments. In serverless (Cloud Run,
@@ -20,15 +20,19 @@ export class IngestionScheduler implements OnModuleInit {
 
   onModuleInit(): void {
     if (!this.config.ingestion.enabled) {
-      this.logger.log("In-process ingestion scheduler disabled (INGESTION_ENABLED=false).");
+      this.logger.log(
+        'In-process ingestion scheduler disabled (INGESTION_ENABLED=false).',
+      );
       return;
     }
 
     const job = new CronJob(this.config.ingestion.cron, () => {
       void this.runner.runAllActive();
     });
-    this.registry.addCronJob("ingestion-sweep", job);
+    this.registry.addCronJob('ingestion-sweep', job);
     job.start();
-    this.logger.log(`Ingestion scheduler started (cron: ${this.config.ingestion.cron}).`);
+    this.logger.log(
+      `Ingestion scheduler started (cron: ${this.config.ingestion.cron}).`,
+    );
   }
 }

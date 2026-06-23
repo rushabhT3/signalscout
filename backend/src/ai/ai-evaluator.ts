@@ -1,4 +1,8 @@
-import type { OutreachDraft, OutreachTone, SignalEvaluation } from "@signalscout/shared";
+import type {
+  OutreachDraft,
+  OutreachTone,
+  SignalEvaluation,
+} from '@signalscout/shared';
 
 export interface EvaluateSignalInput {
   productDescription: string;
@@ -32,4 +36,4 @@ export interface AiEvaluator {
   draftOutreach(input: DraftOutreachInput): Promise<OutreachDraft>;
 }
 
-export const AI_EVALUATOR = Symbol("AI_EVALUATOR");
+export const AI_EVALUATOR = Symbol('AI_EVALUATOR');

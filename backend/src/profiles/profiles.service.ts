@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import type { PublicProfile, UpdateProfileInput } from "@signalscout/shared";
-import { AppConfigService } from "../config/app-config.service";
-import { EmailService } from "../email/email.service";
-import { ProfileRepository } from "./profile.repository";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import type { PublicProfile, UpdateProfileInput } from '@signalscout/shared';
+import { AppConfigService } from '../config/app-config.service';
+import { EmailService } from '../email/email.service';
+import { ProfileRepository } from './profile.repository';
 
 @Injectable()
 export class ProfilesService {
@@ -16,14 +16,17 @@ export class ProfilesService {
     const profile = await this.profiles.findById(userId);
     if (!profile) {
       throw new NotFoundException({
-        code: "profile_not_found",
-        message: "Profile not found.",
+        code: 'profile_not_found',
+        message: 'Profile not found.',
       });
     }
     return profile;
   }
 
-  updateProfile(userId: string, input: UpdateProfileInput): Promise<PublicProfile> {
+  updateProfile(
+    userId: string,
+    input: UpdateProfileInput,
+  ): Promise<PublicProfile> {
     return this.profiles.updateFullName(userId, input.fullName);
   }
 

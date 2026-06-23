@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { AppConfigService } from "../config/app-config.service";
-import type { AuthenticatedUser } from "../auth/auth.types";
-import type { Database } from "./database.types";
+import { Injectable } from '@nestjs/common';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { AppConfigService } from '../config/app-config.service';
+import type { AuthenticatedUser } from '../auth/auth.types';
+import type { Database } from './database.types';
 
 export type TypedSupabaseClient = SupabaseClient<Database>;
 

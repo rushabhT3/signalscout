@@ -3,12 +3,12 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
-} from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-import type { Request } from "express";
-import { SupabaseService } from "../supabase/supabase.service";
-import type { AuthenticatedUser } from "./auth.types";
-import { IS_PUBLIC_KEY } from "./public.decorator";
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import type { Request } from 'express';
+import { SupabaseService } from '../supabase/supabase.service';
+import type { AuthenticatedUser } from './auth.types';
+import { IS_PUBLIC_KEY } from './public.decorator';
 
 type AuthenticatedRequest = Request & { user?: AuthenticatedUser };
 
@@ -36,16 +36,16 @@ export class SupabaseAuthGuard implements CanActivate {
     const token = this.extractBearerToken(request);
     if (!token) {
       throw new UnauthorizedException({
-        code: "unauthorized",
-        message: "Missing bearer token.",
+        code: 'unauthorized',
+        message: 'Missing bearer token.',
       });
     }
 
     const user = await this.supabase.verifyAccessToken(token);
     if (!user) {
       throw new UnauthorizedException({
-        code: "unauthorized",
-        message: "Invalid or expired token.",
+        code: 'unauthorized',
+        message: 'Invalid or expired token.',
       });
     }
 
@@ -58,7 +58,7 @@ export class SupabaseAuthGuard implements CanActivate {
     if (!header) {
       return null;
     }
-    const [scheme, value] = header.split(" ");
-    return scheme?.toLowerCase() === "bearer" && value ? value : null;
+    const [scheme, value] = header.split(' ');
+    return scheme?.toLowerCase() === 'bearer' && value ? value : null;
   }
 }

@@ -1,28 +1,28 @@
-import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
-import { ScheduleModule } from "@nestjs/schedule";
-import { LoggerModule } from "nestjs-pino";
-import { AppConfigModule } from "./config/app-config.module";
-import { AppConfigService } from "./config/app-config.service";
-import { validateEnv } from "./config/env.schema";
-import { buildLoggerParams } from "./common/logger/pino.config";
-import { SupabaseModule } from "./supabase/supabase.module";
-import { EmailModule } from "./email/email.module";
-import { AuthModule } from "./auth/auth.module";
-import { HealthModule } from "./health/health.module";
-import { ProfilesModule } from "./profiles/profiles.module";
-import { TrackersModule } from "./trackers/trackers.module";
-import { SignalsModule } from "./signals/signals.module";
-import { CreditsModule } from "./credits/credits.module";
-import { JobsModule } from "./jobs/jobs.module";
-import { BillingModule } from "./billing/billing.module";
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
+import { LoggerModule } from 'nestjs-pino';
+import { AppConfigModule } from './config/app-config.module';
+import { AppConfigService } from './config/app-config.service';
+import { validateEnv } from './config/env.schema';
+import { buildLoggerParams } from './common/logger/pino.config';
+import { SupabaseModule } from './supabase/supabase.module';
+import { EmailModule } from './email/email.module';
+import { AuthModule } from './auth/auth.module';
+import { HealthModule } from './health/health.module';
+import { ProfilesModule } from './profiles/profiles.module';
+import { TrackersModule } from './trackers/trackers.module';
+import { SignalsModule } from './signals/signals.module';
+import { CreditsModule } from './credits/credits.module';
+import { JobsModule } from './jobs/jobs.module';
+import { BillingModule } from './billing/billing.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      envFilePath: [".env.local", ".env"],
+      envFilePath: ['.env.local', '.env'],
       validate: validateEnv,
     }),
     AppConfigModule,

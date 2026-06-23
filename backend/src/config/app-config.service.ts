@@ -1,6 +1,6 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { APP_CONFIG } from "./config.tokens";
-import type { Env } from "./env.schema";
+import { Inject, Injectable } from '@nestjs/common';
+import { APP_CONFIG } from './config.tokens';
+import type { Env } from './env.schema';
 
 export interface SupabaseConfig {
   url: string;
@@ -10,7 +10,7 @@ export interface SupabaseConfig {
 }
 
 export interface AiConfig {
-  provider: Env["AI_PROVIDER"];
+  provider: Env['AI_PROVIDER'];
   geminiApiKey: string | undefined;
   geminiModel: string;
 }
@@ -42,19 +42,19 @@ export interface IngestionConfig {
 export class AppConfigService {
   constructor(@Inject(APP_CONFIG) private readonly env: Env) {}
 
-  get nodeEnv(): Env["NODE_ENV"] {
+  get nodeEnv(): Env['NODE_ENV'] {
     return this.env.NODE_ENV;
   }
 
   get isProduction(): boolean {
-    return this.env.NODE_ENV === "production";
+    return this.env.NODE_ENV === 'production';
   }
 
   get port(): number {
     return this.env.PORT;
   }
 
-  get logLevel(): Env["LOG_LEVEL"] {
+  get logLevel(): Env['LOG_LEVEL'] {
     return this.env.LOG_LEVEL;
   }
 
@@ -85,7 +85,9 @@ export class AppConfigService {
 
   get stripe(): StripeConfig {
     return {
-      enabled: Boolean(this.env.STRIPE_SECRET_KEY && this.env.STRIPE_PRICE_PRO_MONTHLY),
+      enabled: Boolean(
+        this.env.STRIPE_SECRET_KEY && this.env.STRIPE_PRICE_PRO_MONTHLY,
+      ),
       secretKey: this.env.STRIPE_SECRET_KEY,
       webhookSecret: this.env.STRIPE_WEBHOOK_SECRET,
       proPriceId: this.env.STRIPE_PRICE_PRO_MONTHLY,

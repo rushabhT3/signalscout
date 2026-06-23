@@ -1,11 +1,11 @@
-import { Module } from "@nestjs/common";
-import { ProfilesModule } from "../profiles/profiles.module";
-import { SignalsModule } from "../signals/signals.module";
-import { TrackersModule } from "../trackers/trackers.module";
-import { IngestionRunnerService } from "./ingestion-runner.service";
-import { IngestionScheduler } from "./ingestion.scheduler";
-import { InternalSecretGuard } from "./internal-secret.guard";
-import { JobsController } from "./jobs.controller";
+import { Module } from '@nestjs/common';
+import { ProfilesModule } from '../profiles/profiles.module';
+import { SignalsModule } from '../signals/signals.module';
+import { TrackersModule } from '../trackers/trackers.module';
+import { IngestionRunnerService } from './ingestion-runner.service';
+import { IngestionScheduler } from './ingestion.scheduler';
+import { InternalSecretGuard } from './internal-secret.guard';
+import { JobsController } from './jobs.controller';
 
 @Module({
   imports: [ProfilesModule, SignalsModule, TrackersModule],

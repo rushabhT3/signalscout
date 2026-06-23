@@ -1,16 +1,16 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import type {
   LeadStatus,
   OutreachDraft,
   SignalEvaluation,
   SignalListQuery,
   SignalView,
-} from "@signalscout/shared";
-import { SupabaseService } from "../supabase/supabase.service";
-import type { Database, Json } from "../supabase/database.types";
+} from '@signalscout/shared';
+import { SupabaseService } from '../supabase/supabase.service';
+import type { Database } from '../supabase/database.types';
 
-type SignalRow = Database["public"]["Tables"]["signals"]["Row"];
-type SignalInsert = Database["public"]["Tables"]["signals"]["Insert"];
+type SignalRow = Database['public']['Tables']['signals']['Row'];
+type SignalInsert = Database['public']['Tables']['signals']['Insert'];
 
 export interface CreateSignalParams {
   userId: string;
@@ -29,23 +29,26 @@ export interface CreateSignalParams {
 export class SignalRepository {
   constructor(private readonly supabase: SupabaseService) {}
 
-  async listByUser(userId: string, query: SignalListQuery): Promise<SignalView[]> {
+  async listByUser(
+    userId: string,
+    query: SignalListQuery,
+  ): Promise<SignalView[]> {
     let builder = this.supabase.admin
-      .from("signals")
-      .select("*")
-      .eq("user_id", userId)
-      .order("confidence", { ascending: false })
-      .order("created_at", { ascending: false })
+      .from('signals')
+      .select('*')
+      .eq('user_id', userId)
+      .order('confidence', { ascending: false })
+      .order('created_at', { ascending: false })
       .range(query.offset, query.offset + query.limit - 1);
 
     if (query.matchesOnly) {
-      builder = builder.eq("is_match", true);
+      builder = builder.eq('is_match', true);
     }
     if (query.trackerId) {
-      builder = builder.eq("tracker_id", query.trackerId);
+      builder = builder.eq('tracker_id', query.trackerId);
     }
     if (query.status) {
-      builder = builder.eq("status", query.status);
+      builder = builder.eq('status', query.status);
     }
 
     const { data, error } = await builder;
@@ -57,10 +60,10 @@ export class SignalRepository {
 
   async findById(userId: string, id: string): Promise<SignalView | null> {
     const { data, error } = await this.supabase.admin
-      .from("signals")
-      .select("*")
-      .eq("user_id", userId)
-      .eq("id", id)
+      .from('signals')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('id', id)
       .maybeSingle();
 
     if (error) {
@@ -71,9 +74,9 @@ export class SignalRepository {
 
   async findEvaluatedPostingIds(trackerId: string): Promise<Set<string>> {
     const { data, error } = await this.supabase.admin
-      .from("signals")
-      .select("job_posting_id")
-      .eq("tracker_id", trackerId);
+      .from('signals')
+      .select('job_posting_id')
+      .eq('tracker_id', trackerId);
 
     if (error) {
       throw new Error(`Failed to load evaluated postings: ${error.message}`);
@@ -101,9 +104,9 @@ export class SignalRepository {
     };
 
     const { data, error } = await this.supabase.admin
-      .from("signals")
+      .from('signals')
       .insert(payload)
-      .select("*")
+      .select('*')
       .single();
 
     if (error) {
@@ -112,13 +115,17 @@ export class SignalRepository {
     return this.toView(data);
   }
 
-  async updateStatus(userId: string, id: string, status: LeadStatus): Promise<SignalView | null> {
+  async updateStatus(
+    userId: string,
+    id: string,
+    status: LeadStatus,
+  ): Promise<SignalView | null> {
     const { data, error } = await this.supabase.admin
-      .from("signals")
+      .from('signals')
       .update({ status })
-      .eq("user_id", userId)
-      .eq("id", id)
-      .select("*")
+      .eq('user_id', userId)
+      .eq('id', id)
+      .select('*')
       .maybeSingle();
 
     if (error) {
@@ -133,11 +140,11 @@ export class SignalRepository {
     outreach: OutreachDraft,
   ): Promise<SignalView | null> {
     const { data, error } = await this.supabase.admin
-      .from("signals")
-      .update({ outreach: outreach as unknown as Json })
-      .eq("user_id", userId)
-      .eq("id", id)
-      .select("*")
+      .from('signals')
+      .update({ outreach: outreach })
+      .eq('user_id', userId)
+      .eq('id', id)
+      .select('*')
       .maybeSingle();
 
     if (error) {

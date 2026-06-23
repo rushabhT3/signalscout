@@ -1,12 +1,12 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import {
   PLAN_LIMITS,
   type CreditAccount,
   type CreditLedgerEntry,
-} from "@signalscout/shared";
-import { SupabaseService } from "../supabase/supabase.service";
-import type { CreditReason } from "../supabase/database.types";
-import { InsufficientCreditsException } from "./insufficient-credits.exception";
+} from '@signalscout/shared';
+import { SupabaseService } from '../supabase/supabase.service';
+import type { CreditReason } from '../supabase/database.types';
+import { InsufficientCreditsException } from './insufficient-credits.exception';
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -16,9 +16,9 @@ export class CreditsService {
 
   async getBalance(userId: string): Promise<number> {
     const { data, error } = await this.supabase.admin
-      .from("profiles")
-      .select("credits_balance")
-      .eq("id", userId)
+      .from('profiles')
+      .select('credits_balance')
+      .eq('id', userId)
       .single();
 
     if (error) {
@@ -30,9 +30,9 @@ export class CreditsService {
   /** Returns the credit account, lazily applying the monthly reset when due. */
   async getAccount(userId: string): Promise<CreditAccount> {
     const { data, error } = await this.supabase.admin
-      .from("profiles")
-      .select("plan_tier, credits_balance, credits_reset_at")
-      .eq("id", userId)
+      .from('profiles')
+      .select('plan_tier, credits_balance, credits_reset_at')
+      .eq('id', userId)
       .single();
 
     if (error) {
@@ -44,10 +44,11 @@ export class CreditsService {
     let lastReset = data.credits_reset_at;
 
     if (new Date(lastReset).getTime() <= Date.now() - THIRTY_DAYS_MS) {
-      const { data: resetBalance, error: resetError } = await this.supabase.admin.rpc(
-        "reset_credits_if_due",
-        { p_user_id: userId, p_amount: monthlyAllotment },
-      );
+      const { data: resetBalance, error: resetError } =
+        await this.supabase.admin.rpc('reset_credits_if_due', {
+          p_user_id: userId,
+          p_amount: monthlyAllotment,
+        });
       if (resetError) {
         throw new Error(`Failed to reset credits: ${resetError.message}`);
       }
@@ -59,16 +60,18 @@ export class CreditsService {
       balance,
       planTier: data.plan_tier,
       monthlyAllotment,
-      resetsAt: new Date(new Date(lastReset).getTime() + THIRTY_DAYS_MS).toISOString(),
+      resetsAt: new Date(
+        new Date(lastReset).getTime() + THIRTY_DAYS_MS,
+      ).toISOString(),
     };
   }
 
   async listLedger(userId: string, limit = 20): Promise<CreditLedgerEntry[]> {
     const { data, error } = await this.supabase.admin
-      .from("credit_ledger")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
+      .from('credit_ledger')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
       .limit(limit);
 
     if (error) {
@@ -92,7 +95,7 @@ export class CreditsService {
     reason: CreditReason,
     reference?: string,
   ): Promise<number> {
-    const { data, error } = await this.supabase.admin.rpc("debit_credits", {
+    const { data, error } = await this.supabase.admin.rpc('debit_credits', {
       p_user_id: userId,
       p_amount: amount,
       p_reason: reason,
@@ -100,7 +103,7 @@ export class CreditsService {
     });
 
     if (error) {
-      if (error.message.includes("insufficient_credits")) {
+      if (error.message.includes('insufficient_credits')) {
         throw new InsufficientCreditsException();
       }
       throw new Error(`Failed to debit credits: ${error.message}`);
@@ -114,7 +117,7 @@ export class CreditsService {
     reason: CreditReason,
     reference?: string,
   ): Promise<number> {
-    const { data, error } = await this.supabase.admin.rpc("grant_credits", {
+    const { data, error } = await this.supabase.admin.rpc('grant_credits', {
       p_user_id: userId,
       p_amount: amount,
       p_reason: reason,

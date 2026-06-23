@@ -1,13 +1,13 @@
-import { Inject, Injectable, Optional } from "@nestjs/common";
-import type { HealthReport, HealthState } from "@signalscout/shared";
-import { APP_VERSION, SERVICE_NAME } from "../common/constants";
+import { Inject, Injectable, Optional } from '@nestjs/common';
+import type { HealthReport, HealthState } from '@signalscout/shared';
+import { APP_VERSION, SERVICE_NAME } from '../common/constants';
 
 export interface DependencyCheck {
   readonly name: string;
   check(): Promise<boolean>;
 }
 
-export const READINESS_CHECKS = Symbol("READINESS_CHECKS");
+export const READINESS_CHECKS = Symbol('READINESS_CHECKS');
 
 @Injectable()
 export class HealthService {
@@ -21,7 +21,7 @@ export class HealthService {
   }
 
   liveness(): HealthReport {
-    return this.report("ok");
+    return this.report('ok');
   }
 
   async readiness(): Promise<HealthReport> {
@@ -35,7 +35,7 @@ export class HealthService {
       }),
     );
     const healthy = results.every(Boolean);
-    return this.report(healthy ? "ok" : "degraded");
+    return this.report(healthy ? 'ok' : 'degraded');
   }
 
   private report(status: HealthState): HealthReport {

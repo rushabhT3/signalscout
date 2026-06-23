@@ -4,7 +4,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-} from "@nestjs/common";
+} from '@nestjs/common';
 import {
   CREDIT_COSTS,
   type GenerateOutreachInput,
@@ -12,14 +12,14 @@ import {
   type SignalView,
   type TrackerRunResult,
   type UpdateSignalInput,
-} from "@signalscout/shared";
-import { AI_EVALUATOR, type AiEvaluator } from "../ai/ai-evaluator";
-import { CreditsService } from "../credits/credits.service";
-import { InsufficientCreditsException } from "../credits/insufficient-credits.exception";
-import { IngestionService } from "../ingestion/ingestion.service";
-import type { CreditReason } from "../supabase/database.types";
-import { TrackerRepository } from "../trackers/tracker.repository";
-import { SignalRepository } from "./signal.repository";
+} from '@signalscout/shared';
+import { AI_EVALUATOR, type AiEvaluator } from '../ai/ai-evaluator';
+import { CreditsService } from '../credits/credits.service';
+import { InsufficientCreditsException } from '../credits/insufficient-credits.exception';
+import { IngestionService } from '../ingestion/ingestion.service';
+import type { CreditReason } from '../supabase/database.types';
+import { TrackerRepository } from '../trackers/tracker.repository';
+import { SignalRepository } from './signal.repository';
 
 @Injectable()
 export class SignalsService {
@@ -40,15 +40,25 @@ export class SignalsService {
   async get(userId: string, id: string): Promise<SignalView> {
     const signal = await this.signals.findById(userId, id);
     if (!signal) {
-      throw new NotFoundException({ code: "signal_not_found", message: "Signal not found." });
+      throw new NotFoundException({
+        code: 'signal_not_found',
+        message: 'Signal not found.',
+      });
     }
     return signal;
   }
 
-  async updateStatus(userId: string, id: string, input: UpdateSignalInput): Promise<SignalView> {
+  async updateStatus(
+    userId: string,
+    id: string,
+    input: UpdateSignalInput,
+  ): Promise<SignalView> {
     const updated = await this.signals.updateStatus(userId, id, input.status);
     if (!updated) {
-      throw new NotFoundException({ code: "signal_not_found", message: "Signal not found." });
+      throw new NotFoundException({
+        code: 'signal_not_found',
+        message: 'Signal not found.',
+      });
     }
     return updated;
   }
@@ -58,15 +68,24 @@ export class SignalsService {
    * debiting a credit per evaluation. Stops cleanly when credits run out; refunds
    * a credit when an individual evaluation fails.
    */
-  async runTracker(userId: string, trackerId: string): Promise<TrackerRunResult> {
+  async runTracker(
+    userId: string,
+    trackerId: string,
+  ): Promise<TrackerRunResult> {
     const tracker = await this.trackers.findById(userId, trackerId);
     if (!tracker) {
-      throw new NotFoundException({ code: "tracker_not_found", message: "Tracker not found." });
+      throw new NotFoundException({
+        code: 'tracker_not_found',
+        message: 'Tracker not found.',
+      });
     }
 
     const postings = await this.ingestion.ingestForSources(tracker.sources);
-    const alreadyEvaluated = await this.signals.findEvaluatedPostingIds(trackerId);
-    const fresh = postings.filter((posting) => !alreadyEvaluated.has(posting.id));
+    const alreadyEvaluated =
+      await this.signals.findEvaluatedPostingIds(trackerId);
+    const fresh = postings.filter(
+      (posting) => !alreadyEvaluated.has(posting.id),
+    );
 
     const result: TrackerRunResult = {
       trackerId,
@@ -79,7 +98,12 @@ export class SignalsService {
 
     for (const posting of fresh) {
       try {
-        await this.credits.debit(userId, CREDIT_COSTS.signalEvaluation, "signal_evaluation", posting.id);
+        await this.credits.debit(
+          userId,
+          CREDIT_COSTS.signalEvaluation,
+          'signal_evaluation',
+          posting.id,
+        );
       } catch (error) {
         if (error instanceof InsufficientCreditsException) {
           result.skippedInsufficientCredits = true;
@@ -142,24 +166,30 @@ export class SignalsService {
   ): Promise<SignalView> {
     const signal = await this.signals.findById(userId, signalId);
     if (!signal) {
-      throw new NotFoundException({ code: "signal_not_found", message: "Signal not found." });
+      throw new NotFoundException({
+        code: 'signal_not_found',
+        message: 'Signal not found.',
+      });
     }
     if (!signal.isMatch) {
       throw new BadRequestException({
-        code: "not_a_match",
-        message: "Outreach can only be drafted for matched signals.",
+        code: 'not_a_match',
+        message: 'Outreach can only be drafted for matched signals.',
       });
     }
 
     const tracker = await this.trackers.findById(userId, signal.trackerId);
     if (!tracker) {
-      throw new NotFoundException({ code: "tracker_not_found", message: "Tracker not found." });
+      throw new NotFoundException({
+        code: 'tracker_not_found',
+        message: 'Tracker not found.',
+      });
     }
 
     const outreach = await this.withCredit(
       userId,
       CREDIT_COSTS.outreachDraft,
-      "outreach_draft",
+      'outreach_draft',
       signalId,
       () =>
         this.ai.draftOutreach({
@@ -173,9 +203,16 @@ export class SignalsService {
         }),
     );
 
-    const updated = await this.signals.attachOutreach(userId, signalId, outreach);
+    const updated = await this.signals.attachOutreach(
+      userId,
+      signalId,
+      outreach,
+    );
     if (!updated) {
-      throw new NotFoundException({ code: "signal_not_found", message: "Signal not found." });
+      throw new NotFoundException({
+        code: 'signal_not_found',
+        message: 'Signal not found.',
+      });
     }
     return updated;
   }
@@ -196,11 +233,17 @@ export class SignalsService {
     }
   }
 
-  private async refund(userId: string, amount: number, reference: string): Promise<void> {
+  private async refund(
+    userId: string,
+    amount: number,
+    reference: string,
+  ): Promise<void> {
     await this.credits
-      .grant(userId, amount, "manual_adjustment", `refund:${reference}`)
+      .grant(userId, amount, 'manual_adjustment', `refund:${reference}`)
       .catch((error: unknown) => {
-        this.logger.error(`Failed to refund credits for ${reference}: ${String(error)}`);
+        this.logger.error(
+          `Failed to refund credits for ${reference}: ${String(error)}`,
+        );
       });
   }
 }

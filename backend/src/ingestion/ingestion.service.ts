@@ -1,8 +1,8 @@
-import { createHash } from "node:crypto";
-import { Injectable, Logger } from "@nestjs/common";
-import type { NormalizedJobPosting, TrackerSource } from "@signalscout/shared";
-import { SupabaseService } from "../supabase/supabase.service";
-import { JobBoardRegistry } from "./job-board.registry";
+import { createHash } from 'node:crypto';
+import { Injectable, Logger } from '@nestjs/common';
+import type { NormalizedJobPosting, TrackerSource } from '@signalscout/shared';
+import { SupabaseService } from '../supabase/supabase.service';
+import { JobBoardRegistry } from './job-board.registry';
 
 export interface IngestedPosting {
   id: string;
@@ -61,9 +61,9 @@ export class IngestionService {
     }));
 
     const { data, error } = await this.supabase.admin
-      .from("job_postings")
-      .upsert(rows, { onConflict: "provider,external_id" })
-      .select("id, company, title, location, url, posted_at, description");
+      .from('job_postings')
+      .upsert(rows, { onConflict: 'provider,external_id' })
+      .select('id, company, title, location, url, posted_at, description');
 
     if (error) {
       throw new Error(`Failed to persist job postings: ${error.message}`);
@@ -81,8 +81,8 @@ export class IngestionService {
   }
 
   private hash(posting: NormalizedJobPosting): string {
-    return createHash("sha256")
+    return createHash('sha256')
       .update(`${posting.title}\n${posting.description}`)
-      .digest("hex");
+      .digest('hex');
   }
 }

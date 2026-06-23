@@ -3,30 +3,36 @@
  * would be generated with `supabase gen types typescript`; kept manual here so the
  * repo type-checks without a live project. Keep in sync with the SQL migration.
  */
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
 
-export type PlanTier = "free" | "pro";
+export type PlanTier = 'free' | 'pro';
 
 export type SignalCategory =
-  | "hiring_surge"
-  | "first_role_of_type"
-  | "leadership_hire"
-  | "team_expansion"
-  | "tech_adoption"
-  | "geographic_expansion"
-  | "not_a_match";
+  | 'hiring_surge'
+  | 'first_role_of_type'
+  | 'leadership_hire'
+  | 'team_expansion'
+  | 'tech_adoption'
+  | 'geographic_expansion'
+  | 'not_a_match';
 
-export type LeadStatus = "new" | "saved" | "contacted" | "archived";
+export type LeadStatus = 'new' | 'saved' | 'contacted' | 'archived';
 
-export type JobBoardProvider = "greenhouse" | "lever" | "ashby";
+export type JobBoardProvider = 'greenhouse' | 'lever' | 'ashby';
 
 export type CreditReason =
-  | "signal_evaluation"
-  | "outreach_draft"
-  | "monthly_grant"
-  | "plan_upgrade"
-  | "signup_bonus"
-  | "manual_adjustment";
+  | 'signal_evaluation'
+  | 'outreach_draft'
+  | 'monthly_grant'
+  | 'plan_upgrade'
+  | 'signup_bonus'
+  | 'manual_adjustment';
 
 export interface Database {
   public: {
