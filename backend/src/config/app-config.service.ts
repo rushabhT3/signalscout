@@ -107,4 +107,8 @@ export class AppConfigService {
       batchSize: this.env.INGESTION_BATCH_SIZE,
     };
   }
+
+  get internalApiSecret(): string | undefined {
+    return this.env.INTERNAL_API_SECRET;
+  }
 }

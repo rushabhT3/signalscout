@@ -46,6 +46,8 @@ export const envSchema = z
     RESEND_API_KEY: z.string().min(1).optional(),
     EMAIL_FROM: z.string().min(1).optional(),
 
+    INTERNAL_API_SECRET: z.string().min(1).optional(),
+
     INGESTION_ENABLED: booleanFromEnv,
     INGESTION_CRON: z.string().min(1).default("0 */6 * * *"),
     INGESTION_BATCH_SIZE: z.coerce.number().int().positive().max(100).default(10),
