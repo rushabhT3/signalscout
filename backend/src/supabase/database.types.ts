@@ -236,6 +236,10 @@ export interface Database {
         };
         Returns: number;
       };
+      reset_credits_if_due: {
+        Args: { p_user_id: string; p_amount: number };
+        Returns: number;
+      };
     };
     Enums: {
       plan_tier: PlanTier;
