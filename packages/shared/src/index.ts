@@ -2,6 +2,7 @@ export * from "./api";
 export * from "./profile";
 export * from "./plans";
 export * from "./credits";
+export * from "./billing";
 export * from "./signals";
 export * from "./outreach";
 export * from "./leads";

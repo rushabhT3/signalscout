@@ -14,6 +14,7 @@ import { TrackersModule } from "./trackers/trackers.module";
 import { SignalsModule } from "./signals/signals.module";
 import { CreditsModule } from "./credits/credits.module";
 import { JobsModule } from "./jobs/jobs.module";
+import { BillingModule } from "./billing/billing.module";
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { JobsModule } from "./jobs/jobs.module";
     SignalsModule,
     CreditsModule,
     JobsModule,
+    BillingModule,
   ],
 })
 export class AppModule {}

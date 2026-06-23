@@ -1,9 +1,17 @@
 import { Injectable } from "@nestjs/common";
-import type { PublicProfile } from "@signalscout/shared";
+import type { PlanTier, PublicProfile } from "@signalscout/shared";
 import { SupabaseService } from "../supabase/supabase.service";
 import type { Database } from "../supabase/database.types";
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
+type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
+
+export interface BillingUpdate {
+  planTier?: PlanTier;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string | null;
+  subscriptionStatus?: string | null;
+}
 
 @Injectable()
 export class ProfileRepository {
@@ -34,6 +42,49 @@ export class ProfileRepository {
       throw new Error(`Failed to update profile: ${error.message}`);
     }
     return this.toPublic(data);
+  }
+
+  async getStripeCustomerId(userId: string): Promise<string | null> {
+    const { data, error } = await this.supabase.admin
+      .from("profiles")
+      .select("stripe_customer_id")
+      .eq("id", userId)
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to read billing customer: ${error.message}`);
+    }
+    return data.stripe_customer_id;
+  }
+
+  async findIdByCustomerId(customerId: string): Promise<string | null> {
+    const { data, error } = await this.supabase.admin
+      .from("profiles")
+      .select("id")
+      .eq("stripe_customer_id", customerId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Failed to find profile by customer: ${error.message}`);
+    }
+    return data?.id ?? null;
+  }
+
+  async updateBilling(userId: string, billing: BillingUpdate): Promise<void> {
+    const payload: ProfileUpdate = {};
+    if (billing.planTier !== undefined) payload.plan_tier = billing.planTier;
+    if (billing.stripeCustomerId !== undefined) payload.stripe_customer_id = billing.stripeCustomerId;
+    if (billing.stripeSubscriptionId !== undefined) {
+      payload.stripe_subscription_id = billing.stripeSubscriptionId;
+    }
+    if (billing.subscriptionStatus !== undefined) {
+      payload.subscription_status = billing.subscriptionStatus;
+    }
+
+    const { error } = await this.supabase.admin.from("profiles").update(payload).eq("id", userId);
+    if (error) {
+      throw new Error(`Failed to update billing: ${error.message}`);
+    }
   }
 
   private toPublic(row: ProfileRow): PublicProfile {

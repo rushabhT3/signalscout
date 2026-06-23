@@ -9,7 +9,7 @@ import { TransformInterceptor } from "./common/interceptors/transform.intercepto
 import { setupSwagger } from "./common/swagger";
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create(AppModule, { bufferLogs: true, rawBody: true });
 
   const logger = app.get(Logger);
   app.useLogger(logger);
