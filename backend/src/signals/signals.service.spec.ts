@@ -1,12 +1,18 @@
 import { BadRequestException } from '@nestjs/common';
-import { CREDIT_COSTS, type SignalEvaluation, type Tracker } from '@signalscout/shared';
+import {
+  CREDIT_COSTS,
+  type SignalEvaluation,
+  type Tracker,
+} from '@signalscout/shared';
 import { SignalsService } from './signals.service';
 import { InsufficientCreditsException } from '../credits/insufficient-credits.exception';
 import type { SignalRepository } from './signal.repository';
 import type { TrackerRepository } from '../trackers/tracker.repository';
-import type { IngestedPosting, IngestionService } from '../ingestion/ingestion.service';
+import type {
+  IngestedPosting,
+  IngestionService,
+} from '../ingestion/ingestion.service';
 import type { CreditsService } from '../credits/credits.service';
-import type { AiEvaluator } from '../ai/ai-evaluator';
 
 const TRACKER: Tracker = {
   id: 't1',
@@ -23,7 +29,15 @@ const TRACKER: Tracker = {
 };
 
 function posting(id: string): IngestedPosting {
-  return { id, company: 'Acme', title: 'Account Executive', location: null, url: 'u', postedAt: null, description: 'd' };
+  return {
+    id,
+    company: 'Acme',
+    title: 'Account Executive',
+    location: null,
+    url: 'u',
+    postedAt: null,
+    description: 'd',
+  };
 }
 
 function evaluation(isMatch: boolean): SignalEvaluation {
@@ -55,14 +69,18 @@ function makeService() {
     debit: jest.fn().mockResolvedValue(49),
     grant: jest.fn().mockResolvedValue(50),
   };
-  const ai = { name: 'mock', evaluateSignal: jest.fn(), draftOutreach: jest.fn() };
+  const ai = {
+    name: 'mock',
+    evaluateSignal: jest.fn(),
+    draftOutreach: jest.fn(),
+  };
 
   const service = new SignalsService(
     signals as unknown as SignalRepository,
     trackers as unknown as TrackerRepository,
     ingestion as unknown as IngestionService,
     credits as unknown as CreditsService,
-    ai as unknown as AiEvaluator,
+    ai,
   );
   return { service, signals, trackers, ingestion, credits, ai };
 }
@@ -71,7 +89,10 @@ describe('SignalsService', () => {
   describe('runTracker', () => {
     it('debits, evaluates each fresh posting, and counts matches', async () => {
       const ctx = makeService();
-      ctx.ingestion.ingestForSources.mockResolvedValue([posting('a'), posting('b')]);
+      ctx.ingestion.ingestForSources.mockResolvedValue([
+        posting('a'),
+        posting('b'),
+      ]);
       ctx.ai.evaluateSignal
         .mockResolvedValueOnce(evaluation(true))
         .mockResolvedValueOnce(evaluation(false));
@@ -87,8 +108,13 @@ describe('SignalsService', () => {
 
     it('stops cleanly when credits run out', async () => {
       const ctx = makeService();
-      ctx.ingestion.ingestForSources.mockResolvedValue([posting('a'), posting('b')]);
-      ctx.credits.debit.mockRejectedValueOnce(new InsufficientCreditsException());
+      ctx.ingestion.ingestForSources.mockResolvedValue([
+        posting('a'),
+        posting('b'),
+      ]);
+      ctx.credits.debit.mockRejectedValueOnce(
+        new InsufficientCreditsException(),
+      );
 
       const result = await ctx.service.runTracker('u1', 't1');
 
@@ -113,7 +139,11 @@ describe('SignalsService', () => {
   describe('generateOutreach', () => {
     it('rejects outreach for a non-matching signal', async () => {
       const ctx = makeService();
-      ctx.signals.findById.mockResolvedValue({ id: 's1', isMatch: false, trackerId: 't1' });
+      ctx.signals.findById.mockResolvedValue({
+        id: 's1',
+        isMatch: false,
+        trackerId: 't1',
+      });
 
       await expect(
         ctx.service.generateOutreach('u1', 's1', { tone: 'consultative' }),
@@ -133,7 +163,11 @@ describe('SignalsService', () => {
         likelyNeed: 'n',
         suggestedAngle: 'a',
       });
-      ctx.ai.draftOutreach.mockResolvedValue({ subject: 's', body: 'b', followUp: 'f' });
+      ctx.ai.draftOutreach.mockResolvedValue({
+        subject: 's',
+        body: 'b',
+        followUp: 'f',
+      });
 
       await ctx.service.generateOutreach('u1', 's1', { tone: 'consultative' });
 
