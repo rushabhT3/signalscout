@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { leadStatusSchema, type LeadStatus } from "./leads";
+import type { OutreachDraft } from "./outreach";
 
 export const SIGNAL_CATEGORIES = [
   "hiring_surge",
@@ -38,3 +40,49 @@ export const signalEvaluationSchema = z.object({
 });
 
 export type SignalEvaluation = z.infer<typeof signalEvaluationSchema>;
+
+const booleanQueryParam = z.union([
+  z.boolean(),
+  z.enum(["true", "false"]).transform((value) => value === "true"),
+]);
+
+export const signalListQuerySchema = z.object({
+  trackerId: z.uuid().optional(),
+  status: leadStatusSchema.optional(),
+  matchesOnly: booleanQueryParam.default(true),
+  limit: z.coerce.number().int().min(1).max(100).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+export type SignalListQuery = z.infer<typeof signalListQuerySchema>;
+
+export const updateSignalSchema = z.object({ status: leadStatusSchema });
+export type UpdateSignalInput = z.infer<typeof updateSignalSchema>;
+
+/** A signal as exposed to the frontend (camelCase, outreach parsed). */
+export interface SignalView {
+  id: string;
+  trackerId: string;
+  company: string;
+  title: string;
+  location: string | null;
+  url: string;
+  postedAt: string | null;
+  isMatch: boolean;
+  confidence: number;
+  category: SignalCategory;
+  reasoning: string;
+  likelyNeed: string;
+  suggestedAngle: string;
+  status: LeadStatus;
+  outreach: OutreachDraft | null;
+  createdAt: string;
+}
+
+export interface TrackerRunResult {
+  trackerId: string;
+  postingsIngested: number;
+  evaluated: number;
+  matches: number;
+  creditsSpent: number;
+  skippedInsufficientCredits: boolean;
+}

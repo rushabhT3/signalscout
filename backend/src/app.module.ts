@@ -9,6 +9,8 @@ import { SupabaseModule } from "./supabase/supabase.module";
 import { AuthModule } from "./auth/auth.module";
 import { HealthModule } from "./health/health.module";
 import { ProfilesModule } from "./profiles/profiles.module";
+import { TrackersModule } from "./trackers/trackers.module";
+import { SignalsModule } from "./signals/signals.module";
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { ProfilesModule } from "./profiles/profiles.module";
     AuthModule,
     HealthModule,
     ProfilesModule,
+    TrackersModule,
+    SignalsModule,
   ],
 })
 export class AppModule {}

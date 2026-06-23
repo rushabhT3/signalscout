@@ -20,3 +20,8 @@ export const outreachDraftSchema = z.object({
 });
 
 export type OutreachDraft = z.infer<typeof outreachDraftSchema>;
+
+export const generateOutreachSchema = z.object({
+  tone: outreachToneSchema.default("consultative"),
+});
+export type GenerateOutreachInput = z.infer<typeof generateOutreachSchema>;
