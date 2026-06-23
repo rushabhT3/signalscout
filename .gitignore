@@ -39,3 +39,6 @@ Thumbs.db
 test-results/
 playwright-report/
 **/.playwright/
+
+# local notes
+/PROJECT_STATUS.md
