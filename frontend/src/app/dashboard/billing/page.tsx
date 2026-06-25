@@ -17,6 +17,7 @@ export default function BillingPage() {
   const { data: account } = useSWR("credits", api.credits);
   const { data: ledger } = useSWR("ledger", api.ledger);
   const [loading, setLoading] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(5);
 
   useEffect(() => {
     const status = new URLSearchParams(window.location.search).get("status");
@@ -110,24 +111,33 @@ export default function BillingPage() {
         ) : ledger.length === 0 ? (
           <p className="p-5 text-sm text-muted">No credit activity yet.</p>
         ) : (
-          <ul>
-            {ledger.map((entry) => (
-              <li
-                key={entry.id}
-                className="flex items-center justify-between border-b border-border px-5 py-3 text-sm last:border-0"
-              >
-                <span className="capitalize text-ink-soft">{entry.reason.replace(/_/g, " ")}</span>
-                <span
-                  className={
-                    entry.amount >= 0 ? "font-medium text-accent" : "font-medium text-ink"
-                  }
+          <div>
+            <ul>
+              {ledger.slice(0, visibleCount).map((entry) => (
+                <li
+                  key={entry.id}
+                  className="flex items-center justify-between border-b border-border px-5 py-3 text-sm last:border-0"
                 >
-                  {entry.amount >= 0 ? "+" : ""}
-                  {entry.amount}
-                </span>
-              </li>
-            ))}
-          </ul>
+                  <span className="capitalize text-ink-soft">{entry.reason.replace(/_/g, " ")}</span>
+                  <span
+                    className={
+                      entry.amount >= 0 ? "font-medium text-accent" : "font-medium text-ink"
+                    }
+                  >
+                    {entry.amount >= 0 ? "+" : ""}
+                    {entry.amount}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            {visibleCount < ledger.length && (
+              <div className="border-t border-border p-3 text-center">
+                <Button variant="secondary" size="sm" onClick={() => setVisibleCount((v) => v + 5)}>
+                  Load more
+                </Button>
+              </div>
+            )}
+          </div>
         )}
       </Card>
     </div>
