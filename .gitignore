@@ -35,6 +35,9 @@ Thumbs.db
 .turbo/
 .vercel/
 
+# supabase cli local state (project ref, pooler url with credentials)
+supabase/.temp/
+
 # playwright
 test-results/
 playwright-report/
