@@ -83,12 +83,68 @@ gcloud scheduler jobs create http signalscout-ingestion \
   --headers "x-internal-secret=$INTERNAL_API_SECRET"
 ```
 
-## 5. Stripe webhook
+## 5. Stripe billing (test mode)
 
-In the Stripe dashboard (test mode), add an endpoint
-`https://signalscout-api-xxxx.run.app/api/v1/billing/webhook` for
-`checkout.session.completed`, `customer.subscription.updated`, and
-`customer.subscription.deleted`. Put its signing secret in `STRIPE_WEBHOOK_SECRET` and redeploy.
+Billing is optional and degrades gracefully — leave the Stripe vars blank and the upgrade flow
+is simply disabled. To enable it, set three vars on the API service: `STRIPE_SECRET_KEY`,
+`STRIPE_PRICE_PRO_MONTHLY`, and `STRIPE_WEBHOOK_SECRET`. The backend requires **all three**
+before checkout works (`billing.service.ts` throws `billing_disabled` without the price id).
+
+Everything below is Stripe **test mode** — no real money moves. Use your `sk_test_…` key.
+
+### a. Create the product + price
+
+Use the dashboard (**Product catalog → Add product**, then add a recurring monthly price) or
+the API directly:
+
+```bash
+SK=sk_test_…   # your test secret key
+
+# Product
+PROD=$(curl -s https://api.stripe.com/v1/products -u "$SK:" \
+  --data-urlencode "name=SignalScout Pro" | jq -r .id)
+
+# Recurring monthly price → its id is STRIPE_PRICE_PRO_MONTHLY
+curl -s https://api.stripe.com/v1/prices -u "$SK:" \
+  -d product="$PROD" -d unit_amount=150000 -d currency=inr \
+  -d "recurring[interval]=month" | jq -r .id
+```
+
+> **India accounts must price in INR.** A Stripe account registered to an Indian *individual*
+> cannot accept international (e.g. USD) payments — checkout fails with _"only registered Indian
+> businesses can accept international payments."_ Use `currency=inr` with the amount in paise
+> (`150000` = ₹1,500). Registered businesses can price in other currencies.
+
+### b. Register the webhook endpoint
+
+Subscribe to exactly the three events the API handles. The `secret` the API returns (shown only
+once) is your `STRIPE_WEBHOOK_SECRET`:
+
+```bash
+curl -s https://api.stripe.com/v1/webhook_endpoints -u "$SK:" \
+  --data-urlencode "url=https://signalscout-api-xxxx.run.app/api/v1/billing/webhook" \
+  -d "enabled_events[]=checkout.session.completed" \
+  -d "enabled_events[]=customer.subscription.updated" \
+  -d "enabled_events[]=customer.subscription.deleted" | jq -r .secret
+```
+
+Dashboard equivalent: **Developers → Webhooks → Add endpoint**, same URL + events, then
+*reveal* the signing secret.
+
+### c. Wire the secrets onto Cloud Run
+
+Env-only update — no rebuild, just a new revision:
+
+```bash
+gcloud run services update signalscout-api --region "$REGION" \
+  --update-env-vars "STRIPE_SECRET_KEY=sk_test_…,STRIPE_PRICE_PRO_MONTHLY=price_…,STRIPE_WEBHOOK_SECRET=whsec_…"
+```
+
+### d. Test
+
+On the billing page click **Upgrade to Pro** and pay with test card `4242 4242 4242 4242` (any
+future expiry, any CVC). Stripe redirects back to `/dashboard/billing?status=success`, fires
+`checkout.session.completed`, and the webhook flips the account to Pro and grants its credits.
 
 ## Automated deploys (GitHub Actions)
 
