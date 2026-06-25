@@ -73,51 +73,20 @@ signalscout/
 └── .github/workflows/   # CI + deploy
 ```
 
-## Quickstart (local)
+## Get started
 
-> Prerequisites: Node 22+, a free [Supabase](https://supabase.com) project (or the Supabase
-> CLI), and optionally a free [Gemini API key](https://aistudio.google.com/apikey).
+> Prerequisites: Node 22+ and a free [Supabase](https://supabase.com) project.
 
 ```bash
-npm install                          # installs all workspaces, builds shared contracts
-
-# 1. Configure
-cp backend/.env.example backend/.env            # fill in Supabase keys (Gemini/Stripe/Resend optional)
+npm install                                       # installs workspaces, builds shared contracts
+cp backend/.env.example backend/.env              # add your Supabase keys
 cp frontend/.env.local.example frontend/.env.local
-
-# 2. Apply the database schema to your Supabase project
-npx supabase db push        # or run supabase/migrations/*.sql in the SQL editor
-
-# 3. (optional) Seed a demo account + sample signals
-npm run db:seed
-
-# 4. Run both apps
-npm run dev                  # api on :8080, web on :3000
+npm run dev                                        # api on :8080, web on :3000
 ```
 
-The API runs with `AI_PROVIDER=mock` by default — no Gemini key required to try it.
-Full walkthrough: [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md).
-
-## Scripts
-
-| Command | Description |
-|---|---|
-| `npm run dev` | Run backend + frontend together |
-| `npm run build` | Build shared, backend, and frontend |
-| `npm run lint` | Lint both apps |
-| `npm run test -w backend` | Backend unit tests |
-| `npm run test:e2e -w backend` | Backend e2e (health) |
-| `npm run test:e2e -w frontend` | Playwright e2e |
-| `npm run db:push` / `db:seed` | Apply migrations / seed demo data |
-
-## Testing
-
-- **Unit** — services and pure logic (auth guard, credit/AI pipeline, ingestion adapters).
-- **Integration / e2e** — NestJS app boot + health probes (Jest + Supertest).
-- **End-to-end** — Playwright drives the landing → signup flow in a real browser.
-
-CI runs lint, typecheck, all tests, both production builds, and validates both Docker images
-on every push.
+The API runs with `AI_PROVIDER=mock` by default — no keys required to try it. The full
+walkthrough (schema, seeding, all scripts, and enabling Gemini/Stripe/Resend) lives in
+**[docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md)**.
 
 ## Documentation
 
@@ -125,7 +94,7 @@ on every push.
 - [Database schema & ER diagram](docs/DATABASE.md)
 - [API reference](docs/API.md)
 - [Local setup](docs/LOCAL_SETUP.md)
-- [Deployment to Google Cloud Run](docs/DEPLOYMENT.md)
+- [Deployment to Google Cloud Run](docs/DEPLOYMENT.md) — includes the [Stripe billing setup](docs/DEPLOYMENT.md#5-stripe-billing-test-mode)
 - [Environment variables](docs/ENVIRONMENT.md)
 
 ## License
